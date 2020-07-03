@@ -89,6 +89,17 @@ SET(SRC_FILES
     odometry/OdometryLOAM.cpp
     odometry/OdometryMSCKF.cpp
     odometry/OdometryVINS.cpp
+    odometry/OdometryLineFusion.cpp
+	odometry/EDLines.cpp
+	odometry/FusedLineExtractor.cpp
+	odometry/CudaPointCloud.cu
+	odometry/LineMatcher.cpp
+	odometry/LineSegment.cpp
+	odometry/FLFrame.cpp
+	odometry/Utils.cpp
+	odometry/cuda.hpp
+	odometry/cov.cu
+	odometry/eig.cu
     
     IMUThread.cpp
     IMUFilter.cpp
@@ -132,6 +143,7 @@ ENDIF(OpenCV_VERSION_MAJOR EQUAL 2)
 IF(MSVC)
     FILE(GLOB HEADERS
        ../include/${PROJECT_PREFIX}/core/*.h
+       ../include/${PROJECT_PREFIX}/core/odometry/*.h
     )
     SET(SRC_FILES ${SRC_FILES} ${HEADERS})
 ENDIF(MSVC)
@@ -636,7 +648,7 @@ INCLUDE_DIRECTORIES(${INCLUDE_DIRS})
 
 # Add binary that is built from the source file "main.cpp".
 # The extension is automatically found.
-ADD_LIBRARY(rtabmap_core ${SRC_FILES} ${RESOURCES_HEADERS})
+CUDA_ADD_LIBRARY(rtabmap_core ${SRC_FILES} ${RESOURCES_HEADERS})
 TARGET_LINK_LIBRARIES(rtabmap_core rtabmap_utilite ${LIBRARIES})
 
 SET_TARGET_PROPERTIES(

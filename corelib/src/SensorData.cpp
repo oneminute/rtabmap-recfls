@@ -765,7 +765,7 @@ void SensorData::setFeatures(const std::vector<cv::KeyPoint> & keypoints, const 
 
 long SensorData::getMemoryUsed() const // Return memory usage in Bytes
 {
-	return _imageCompressed.total()*_imageCompressed.elemSize() +
+	/*return _imageCompressed.total()*_imageCompressed.elemSize() +
 			_imageRaw.total()*_imageRaw.elemSize() +
 			_depthOrRightCompressed.total()*_depthOrRightCompressed.elemSize() +
 			_depthOrRightRaw.total()*_depthOrRightRaw.elemSize() +
@@ -781,7 +781,8 @@ long SensorData::getMemoryUsed() const // Return memory usage in Bytes
 			_emptyCellsRaw.total()*_emptyCellsRaw.elemSize()+
 			_keypoints.size() * sizeof(float) * 7 +
 			_keypoints3D.size() * sizeof(float)*3 +
-			_descriptors.total()*_descriptors.elemSize();
+			_descriptors.total()*_descriptors.elemSize();*/
+	return 0;
 }
 
 void SensorData::clearCompressedData(bool images, bool scan, bool userData)

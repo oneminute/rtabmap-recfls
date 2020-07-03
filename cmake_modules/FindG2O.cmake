@@ -1,8 +1,8 @@
 #Pre-requisites: Look for csparse
 FIND_PATH(CSPARSE_INCLUDE_DIR NAMES cs.h PATH_SUFFIXES suitesparse csparse EXTERNAL/suitesparse EXTERNAL/csparse
-  PATHS "C:\\Program Files\\g2o\\include\\EXTERNAL")
+  PATHS "$ENV{G2O_ROOT}/include/EXTERNAL")
 FIND_LIBRARY(CSPARSE_LIBRARY NAMES cxsparse g2o_ext_csparse 
-  PATHS "C:\\Program Files\\g2o\\lib")
+  PATHS "$ENV{G2O_ROOT}/lib")
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(CSPARSE DEFAULT_MSG CSPARSE_INCLUDE_DIR CSPARSE_LIBRARY)
@@ -15,7 +15,7 @@ FIND_LIBRARY(CHOLMOD_LIB cholmod)
 # G2O: Find the header files
 
 FIND_PATH(G2O_INCLUDE_DIR g2o/core/base_vertex.h 
-  PATHS "C:\\Program Files\\g2o\\include")
+  PATHS "$ENV{G2O_ROOT}/include")
 
 FIND_FILE(G2O_CONFIG_FILE g2o/config.h 
   PATHS ${G2O_INCLUDE_DIR}
@@ -32,11 +32,11 @@ MACRO(FIND_G2O_LIBRARY MYLIBRARY MYLIBRARYNAME)
 
   FIND_LIBRARY("${MYLIBRARY}_DEBUG"
     NAMES "g2o_${MYLIBRARYNAME}_d"
-	PATHS "C:\\Program Files\\g2o\\lib")
+	PATHS "$ENV{G2O_ROOT}/lib")
   
   FIND_LIBRARY(${MYLIBRARY}
     NAMES "g2o_${MYLIBRARYNAME}"
-	PATHS "C:\\Program Files\\g2o\\lib")
+	PATHS "$ENV{G2O_ROOT}/lib")
   
   IF(${MYLIBRARY}_DEBUG AND ${MYLIBRARY})
     SET(${MYLIBRARY}

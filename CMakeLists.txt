@@ -198,6 +198,7 @@ option(WITH_MSCKF_VIO     "Include MSCKF_VIO support"           OFF)
 option(WITH_VINS          "Include VINS-Fusion support"          ON)
 option(WITH_MADGWICK      "Include Madgwick IMU filtering support" ON)
 option(WITH_FASTCV        "Include FastCV support"               ON)
+option(WITH_CUDA          "Include Cuda support"                 ON)
 IF(ANDROID)
 option(PCL_OMP            "With PCL OMP implementations"         OFF)
 ELSE()
@@ -210,9 +211,18 @@ set_property(CACHE RTABMAP_QT_VERSION PROPERTY STRINGS AUTO 4 5)
 FIND_PACKAGE(OpenCV REQUIRED QUIET)
 
 IF(WITH_QT)
-FIND_PACKAGE(PCL 1.7 REQUIRED QUIET COMPONENTS common io kdtree search surface filters registration sample_consensus segmentation visualization)
+FIND_PACKAGE(PCL 1.7 REQUIRED QUIET COMPONENTS common io kdtree search surface filters registration sample_consensus segmentation visualization gpu_containers)
+
+# Find includes in corresponding build directories
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+# Instruct CMake to run moc automatically when needed.
+set(CMAKE_AUTOMOC ON)
+# Instruct CMake to create code from Qt designer ui files
+#set(CMAKE_AUTOUIC ON)
+set(CMAKE_CXX_STANDARD 14)
+
 ELSE()
-FIND_PACKAGE(PCL 1.7 REQUIRED QUIET COMPONENTS common io kdtree search surface filters registration sample_consensus segmentation )
+FIND_PACKAGE(PCL 1.7 REQUIRED QUIET COMPONENTS common io kdtree search surface filters registration sample_consensus segmentation gpu_containers)
 ENDIF()
 if(PCL_COMPILE_OPTIONS)
   if("${PCL_COMPILE_OPTIONS}" MATCHES "-march=native")
@@ -599,6 +609,17 @@ IF(WITH_ORB_SLAM2 AND NOT G2O_FOUND)
        ENDIF()
     ENDIF(ORB_SLAM2_FOUND)
 ENDIF(WITH_ORB_SLAM2 AND NOT G2O_FOUND)
+
+IF(WITH_CUDA)
+    INCLUDE(FindCUDA)
+    FIND_PACKAGE(CUDA QUIET)
+    set(__cuda_arch_bin "5.0 5.2 5.3 6.0 6.1")
+    IF(MSVC)
+        set(CUDA_NVCC_FLAGS "-Xcompiler \"/wd 4819\" --ftz=true;--prec-div=false;--prec-sqrt=false;--expt-relaxed-constexpr")
+    ELSE(MSVC)
+        set(CUDA_NVCC_FLAGS "--ftz=true;--prec-div=false;--prec-sqrt=false;--expt-relaxed-constexpr")
+    ENDIF(MSVC)
+ENDIF(WITH_CUDA)
 
 IF(loam_velodyne_FOUND OR PCL_VERSION VERSION_GREATER "1.9.1" OR TORCH_FOUND)
    #LOAM and PCL>=1.10 require c++14
