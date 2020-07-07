@@ -117,7 +117,7 @@ void LineMatcher::match(
         avgDist += dist;
         sqrDist += dist * dist;
 
-        //qDebug().noquote() << i.value() << "-->" << i.key() << ":" << radians << dist;
+        qDebug().noquote() << i.value() << "-->" << i.key() << ":" << radians << dist;
     }
     // Çó¾ùÖµ
     avgRadians /= pairs.size();

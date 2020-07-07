@@ -42,7 +42,9 @@ public:
 
     cv::Mat colorLinesMat() const { return m_colorLinesMat; }
     cv::Mat linesMat() const { return m_linesMat; }
-    void generateDescriptors(pcl::PointCloud<LineSegment>::Ptr lines, float radius, int segments, int angleSegments, float width, float height, float cx, float cy, float fx, float fy);
+    void generateCylinderDescriptors(pcl::PointCloud<LineSegment>::Ptr lines, float radius, int segments, int angleSegments, float width, float height, float cx, float cy, float fx, float fy);
+    void generateVoxelsDescriptors(SensorData& data, pcl::PointCloud<LineSegment>::Ptr lines, float radius, int radiusSegments, int segments, int angleSegments, float width, float height, float cx, float cy, float fx, float fy);
+
     //pcl::PointCloud<LineSegment>::Ptr linesCloud() { return m_linesCloud; }
     /*void generateLineDescriptor(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, pcl::PointCloud<pcl::Normal>::Ptr normals, const cv::Mat& pointsMat,
         const Eigen::Vector3f& point, const Eigen::Vector3f& dir, const LineSegment& line, LineDescriptor3& desc, int offset,
@@ -51,18 +53,23 @@ public:
     bool available2dPoint(const Eigen::Vector2f& v);*/
 
 private:
+    int quadrantStatisticByVoxel(pcl::octree::OctreePointCloudSearch<pcl::PointNormal>& tree, const Eigen::Vector3f& key, int length, int xStep, int yStep, int zStep);
+
+private:
     bool m_init;
     cv::Mat m_boundaryMat;
     cv::Mat m_pointsMat;
     cv::Mat m_colorLinesMat;
     cv::Mat m_linesMat;
     std::vector<float3> m_points;
+    std::vector<float3> m_normals;
     //pcl::PointCloud<pcl::PointXYZ>::Ptr m_cloud;
     pcl::PointCloud<pcl::PointXYZI>::Ptr m_allBoundary;
     //pcl::PointCloud<pcl::Normal>::Ptr m_normals;
     QMap<int, pcl::PointCloud<pcl::PointXYZI>::Ptr> m_groupPoints;
     //pcl::PointCloud<LineSegment>::Ptr m_linesCloud;
     cuda::GpuFrame m_frameGpu;
+    float m_resolution;
 };
 
 #endif // FUSEDLINEEXTRACTOR_H

@@ -34,100 +34,100 @@ namespace cuda
             return true;
         }
 
-        __device__ __forceinline__ void extracPointCloud()
-        {
-            size_t index = blockIdx.x * blockDim.x + threadIdx.x;
+        //__device__ __forceinline__ void extracPointCloud()
+        //{
+        //    size_t index = blockIdx.x * blockDim.x + threadIdx.x;
 
-            if (index == 0)
-            {
-                printf("cx %f, cy %f, fx %f, fy %f, shift %f, width %d, height %d, boundary radius: %f, normalKernalRadius: %d, boundary angle threshold: %f, normal knn radius: %f, min cluster peaks: %d, max cluster peaks: %d\n", 
-                    parameters.cx, parameters.cy, parameters.fx, parameters.fy, parameters.depthShift, parameters.depthWidth, parameters.depthHeight, 
-                    parameters.boundaryEstimationDistance, parameters.normalKernalRadius, parameters.boundaryAngleThreshold, parameters.normalKnnRadius,
-                    parameters.minClusterPeaks, parameters.maxClusterPeaks);
-            }
+        //    if (index == 0)
+        //    {
+        //        printf("cx %f, cy %f, fx %f, fy %f, shift %f, width %d, height %d, boundary radius: %f, normalKernalRadius: %d, boundary angle threshold: %f, normal knn radius: %f, min cluster peaks: %d, max cluster peaks: %d\n", 
+        //            parameters.cx, parameters.cy, parameters.fx, parameters.fy, parameters.depthShift, parameters.depthWidth, parameters.depthHeight, 
+        //            parameters.boundaryEstimationDistance, parameters.normalKernalRadius, parameters.boundaryAngleThreshold, parameters.normalKnnRadius,
+        //            parameters.minClusterPeaks, parameters.maxClusterPeaks);
+        //    }
 
-            int ix = index % parameters.depthWidth;
-            int iy = index / parameters.depthWidth;
+        //    int ix = index % parameters.depthWidth;
+        //    int iy = index / parameters.depthWidth;
 
-            float x = 0, y = 0, z = 0;
-            float zValue = depthImage[index] * 1.f;
-            z = zValue / parameters.depthShift;
-            x = (ix - parameters.cx) * z / parameters.fx;
-            y = (iy - parameters.cy) * z / parameters.fy;
+        //    float x = 0, y = 0, z = 0;
+        //    float zValue = depthImage[index] * 1.f;
+        //    z = zValue / parameters.depthShift;
+        //    x = (ix - parameters.cx) * z / parameters.fx;
+        //    y = (iy - parameters.cy) * z / parameters.fy;
 
-            float qnan = std::numeric_limits<float>::quiet_NaN();
-            pointCloud[index].x = qnan;
+        //    float qnan = std::numeric_limits<float>::quiet_NaN();
+        //    pointCloud[index].x = qnan;
 
-            /*if (index % 1024 == 0)
-            {
-                printf("ix: %d, iy: %d, x: %f, y: %f, z: %f, depth: %d\n", ix, iy, x, y, z, depthImage[index]);
-            }*/
-            pointCloud[index].x = x;
-            pointCloud[index].y = y;
-            pointCloud[index].z = z;
+        //    /*if (index % 1024 == 0)
+        //    {
+        //        printf("ix: %d, iy: %d, x: %f, y: %f, z: %f, depth: %d\n", ix, iy, x, y, z, depthImage[index]);
+        //    }*/
+        //    pointCloud[index].x = x;
+        //    pointCloud[index].y = y;
+        //    pointCloud[index].z = z;
 
-            if (isValid(pointCloud[index]))
-            {
-                indicesImage[index] = index;
-            }
-        }
+        //    if (isValid(pointCloud[index]))
+        //    {
+        //        indicesImage[index] = index;
+        //    }
+        //}
 
-        __device__ __forceinline__ void estimateNormals()
-        {
-            size_t index = blockIdx.x * blockDim.x + threadIdx.x;
-            int ix = index % parameters.depthWidth;
-            int iy = index / parameters.depthWidth;
+        //__device__ __forceinline__ void estimateNormals()
+        //{
+        //    size_t index = blockIdx.x * blockDim.x + threadIdx.x;
+        //    int ix = index % parameters.depthWidth;
+        //    int iy = index / parameters.depthWidth;
 
-            float3 center = make_float3(0, 0, 0);
-            float C_2d[3][3] = { {0,0,0},{0,0,0},{0,0,0} };
-            float* C = (float*)C_2d; //rowwise
-            float3 normal;
-            int count = 0;
+        //    float3 center = make_float3(0, 0, 0);
+        //    float C_2d[3][3] = { {0,0,0},{0,0,0},{0,0,0} };
+        //    float* C = (float*)C_2d; //rowwise
+        //    float3 normal;
+        //    int count = 0;
 
-            float3 point = pointCloud[index];
-            if (!isValid(point))
-                return;
+        //    float3 point = pointCloud[index];
+        //    if (!isValid(point))
+        //        return;
 
-            float maxDistance = parameters.normalKnnRadius * parameters.normalKnnRadius;
+        //    float maxDistance = parameters.normalKnnRadius * parameters.normalKnnRadius;
 
-            for (int j = max(0, iy - parameters.normalKernalRadius); j < min(iy + parameters.normalKernalRadius + 1, parameters.depthHeight); j++) {
-                for (int i = max(0, ix - parameters.normalKernalRadius); i < min(ix + parameters.normalKernalRadius + 1, parameters.depthWidth); i++) {
-                    size_t neighbourIndex = j * parameters.depthWidth + i;
-                    float3 diff3 = pointCloud[neighbourIndex] - pointCloud[index];
-                    float norm = dot(diff3, diff3);
-                    //printf("index: %d, ix: %d, iy: %d, norm: %f, max distance: %f\n", index, ix, iy, norm, maxDistance);
-                    if (norm < maxDistance) {
-                        center += pointCloud[neighbourIndex];
-                        outerAdd(pointCloud[neighbourIndex], C); //note: instead of pts[ind]-center, we demean afterwards
-                        count++;
-                    }
-                }
-            }
-            //indices[0] = count;
-            //printf("index: %d, ix: %d, iy: %d, x: %f, y: %f, z: %f, count: %d\n", index, ix, iy, normal.x, normal.y, normal.z, count);
-            if (count < 3)
-                return;
+        //    for (int j = max(0, iy - parameters.normalKernalRadius); j < min(iy + parameters.normalKernalRadius + 1, parameters.depthHeight); j++) {
+        //        for (int i = max(0, ix - parameters.normalKernalRadius); i < min(ix + parameters.normalKernalRadius + 1, parameters.depthWidth); i++) {
+        //            size_t neighbourIndex = j * parameters.depthWidth + i;
+        //            float3 diff3 = pointCloud[neighbourIndex] - pointCloud[index];
+        //            float norm = dot(diff3, diff3);
+        //            //printf("index: %d, ix: %d, iy: %d, norm: %f, max distance: %f\n", index, ix, iy, norm, maxDistance);
+        //            if (norm < maxDistance) {
+        //                center += pointCloud[neighbourIndex];
+        //                outerAdd(pointCloud[neighbourIndex], C); //note: instead of pts[ind]-center, we demean afterwards
+        //                count++;
+        //            }
+        //        }
+        //    }
+        //    //indices[0] = count;
+        //    //printf("index: %d, ix: %d, iy: %d, x: %f, y: %f, z: %f, count: %d\n", index, ix, iy, normal.x, normal.y, normal.z, count);
+        //    if (count < 3)
+        //        return;
 
-            center /= (count + 0.0f);
-            outerAdd(center, C, -count);
-            float fac = 1.0f / (count - 1.0f);
-            mul(C, fac);
-            float Q[3][3] = { {0,0,0},{0,0,0},{0,0,0} };
-            float w[3] = { 0, 0, 0 };
-            int result = dsyevv3(C_2d, Q, w);
+        //    center /= (count + 0.0f);
+        //    outerAdd(center, C, -count);
+        //    float fac = 1.0f / (count - 1.0f);
+        //    mul(C, fac);
+        //    float Q[3][3] = { {0,0,0},{0,0,0},{0,0,0} };
+        //    float w[3] = { 0, 0, 0 };
+        //    int result = dsyevv3(C_2d, Q, w);
 
-            normal.x = Q[0][0];
-            normal.y = Q[1][0];
-            normal.z = Q[2][0];
+        //    normal.x = Q[0][0];
+        //    normal.y = Q[1][0];
+        //    normal.z = Q[2][0];
 
-            pointCloudNormals[index] = normalize(normal);
+        //    pointCloudNormals[index] = normalize(normal);
 
-            //printf("index: %d, ix: %d, iy: %d, x: %f, y: %f, z: %f, depth: %d\n", index, ix, iy, normal.x, normal.y, normal.z, count);
+        //    //printf("index: %d, ix: %d, iy: %d, x: %f, y: %f, z: %f, depth: %d\n", index, ix, iy, normal.x, normal.y, normal.z, count);
 
-            //.x = normal.x;
-            //pointCloudNormals[index].y = normal.y;
-            //pointCloudNormals[index].z = normal.z;
-        }
+        //    //.x = normal.x;
+        //    //pointCloudNormals[index].y = normal.y;
+        //    //pointCloudNormals[index].z = normal.z;
+        //}
 
         __device__ __forceinline__ void extractBoundaries()
         {
@@ -143,6 +143,7 @@ namespace cuda
             float3 point = pointCloud[index];
             if (!isValid(point))
                 return;
+            //printf("%d %d %f %f %f\n", ix, iy, point.x, point.y, point.z);
 
             float maxDistance = parameters.boundaryEstimationDistance * parameters.boundaryEstimationDistance;
 
@@ -442,6 +443,7 @@ namespace cuda
             if (!isValid(point))
                 return;
 
+            //printf("%d %d boundary image: %d\n", ix, iy, boundaryImage[index]);
             if (boundaryImage[index] == 4)
             {
                 bool valid = true;
@@ -572,12 +574,12 @@ namespace cuda
 
     __global__ void extractPointCloud(ExtractPointCloud epc)
     {
-        epc.extracPointCloud();
+        //epc.extracPointCloud();
     }
 
     __global__ void estimateNormals(ExtractPointCloud epc)
     {
-        epc.estimateNormals();
+        //epc.estimateNormals();
     }
 
     __global__ void extractBoundaries(ExtractPointCloud epc)
@@ -601,9 +603,9 @@ namespace cuda
         dim3 grid(frame.parameters.depthWidth * frame.parameters.depthHeight / block.x);
 
         int size = frame.parameters.depthWidth * frame.parameters.depthHeight;
-        cudaMemset(frame.pointCloud.ptr(), 0, size * sizeof(float3));
+        //cudaMemset(frame.pointCloud.ptr(), 0, size * sizeof(float3));
         cudaMemset(frame.pointCloudCache.ptr(), 0, size * sizeof(float3));
-        cudaMemset(frame.pointCloudNormals.ptr(), 0, size * sizeof(float3));
+        //cudaMemset(frame.pointCloudNormals.ptr(), 0, size * sizeof(float3));
         cudaMemset(frame.indicesImage.ptr(), -1, size * sizeof(int));
         cudaMemset(frame.boundaries.ptr(), 0, size * sizeof(uchar));
         cudaMemset(frame.boundaryImage.ptr(), 0, size * sizeof(uchar));
@@ -621,43 +623,17 @@ namespace cuda
         epc.boundaryImage = frame.boundaryImage;
         epc.neighbours = frame.neighbours;
 
-        //TICK("cuda_extractPointCloud");
-        extractPointCloud<<<grid, block>>>(epc);
+        /*extractPointCloud<<<grid, block>>>(epc);
         safeCall(cudaDeviceSynchronize());
-        //TOCK("cuda_extractPointCloud");
 
-        //TICK("cuda_gaussianBlur");
-        //gaussianBlur<<<grid, block>>>(epc);
-        //safeCall(cudaDeviceSynchronize());
-        //TOCK("cuda_gaussianBlur");
-
-        //pcl::gpu::DeviceArray<float3> t = frame.pointCloud;
-        //frame.pointCloudCache.copyTo(frame.pointCloud);
-        //safeCall(cudaDeviceSynchronize());
-        //cudaMemset(frame.pointCloudCache.ptr(), 0, size * sizeof(float3));
-        //safeCall(cudaDeviceSynchronize());
-
-        //TICK("cuda_extimateNormals");
         estimateNormals<<<grid, block>>>(epc);
-        safeCall(cudaDeviceSynchronize());
-        //TOCK("cuda_extimateNormals");
+        safeCall(cudaDeviceSynchronize());*/
 
-        //pcl::gpu::PtrSz<float3> t = epc.points;
-        //epc.points = epc.pointsCache;
-        //epc.pointsCache = t;
-
-        //TICK("cuda_extractBoundaries");
         extractBoundaries<<<grid, block>>>(epc);
         safeCall(cudaDeviceSynchronize());
-        //TOCK("cuda_extractBoundaries");
 
-        //smoothBoudaries<<<grid, block>>>(epc);
-        //safeCall(cudaDeviceSynchronize());
-
-        //TICK("cuda_classifyBoundaries");
         classifyBoundaries<<<grid, block>>>(epc);
         safeCall(cudaDeviceSynchronize());
-        //TOCK("cuda_classifyBoundaries");
     }
 
 }

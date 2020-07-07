@@ -60,6 +60,12 @@ public:
 
     int shortDescriptorSize() const;
 
+    static int longDescriptorSize();
+
+    const std::vector<float>& longDescriptor() const;
+
+    void setLongDescriptor(const std::vector<float>& desc);
+
     void calculateColorAvg(const cv::Mat& mat);
 
     void drawColorLine(cv::Mat& mat);
@@ -106,14 +112,14 @@ struct pcl::DefaultPointRepresentation<LineSegment>: public pcl::PointRepresenta
 public:
     DefaultPointRepresentation()
     {
-        nr_dimensions_ = 13;
+        nr_dimensions_ = LineSegment::longDescriptorSize();
     }
 
     void copyToFloatArray(const LineSegment& l, float* out) const override
     {
         for (int i = 0; i < nr_dimensions_; i++)
         {
-            out[i] = l.shortDescriptor()[i];
+            out[i] = l.longDescriptor()[i];
         }
     }
 

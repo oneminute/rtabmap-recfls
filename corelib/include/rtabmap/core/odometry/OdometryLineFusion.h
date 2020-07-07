@@ -57,8 +57,6 @@ public:
 
     virtual Transform computeTransform(SensorData& data, const Transform& guess = Transform(), OdometryInfo* info = 0) override;
 
-    void extractLines(SensorData& data);
-
 private:
     bool init(SensorData& data);
 

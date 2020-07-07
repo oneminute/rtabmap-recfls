@@ -33,7 +33,7 @@ public:
     int index;
 
     Eigen::Matrix<float, 1, 13> shortDescriptor;
-    //Eigen::VectorXf longDescriptor;
+    std::vector<float> longDescriptor;
 };
 
 LineSegment::LineSegment(const Eigen::Vector3f &start, const Eigen::Vector3f &end, int segmentNo, QObject *parent)
@@ -187,6 +187,21 @@ void LineSegment::reproject(const Eigen::Matrix3f& rot, const Eigen::Vector3f& t
 int LineSegment::shortDescriptorSize() const
 {
     return data->shortDescriptor.size();
+}
+
+int LineSegment::longDescriptorSize()
+{
+    return 5 * 8;
+}
+
+const std::vector<float>& LineSegment::longDescriptor() const
+{
+    return data->longDescriptor;
+}
+
+void LineSegment::setLongDescriptor(const std::vector<float>& desc)
+{
+    data->longDescriptor = desc;
 }
 
 void LineSegment::calculateColorAvg(const cv::Mat& mat)
