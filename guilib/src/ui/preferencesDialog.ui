@@ -20,7 +20,7 @@
    <string>Preferences</string>
   </property>
   <property name="windowIcon">
-   <iconset>
+   <iconset resource="../GuiLib.qrc">
     <normaloff>:/images/RTAB-Map.ico</normaloff>:/images/RTAB-Map.ico</iconset>
   </property>
   <layout class="QGridLayout" name="gridLayout_49">
@@ -5958,7 +5958,7 @@ when using the file type, logs are saved in LogRtabmap.txt (located in the worki
                               <string/>
                              </property>
                              <property name="icon">
-                              <iconset>
+                              <iconset resource="../GuiLib.qrc">
                                <normaloff>:/images/mag_glass.png</normaloff>:/images/mag_glass.png</iconset>
                              </property>
                             </widget>
@@ -6732,7 +6732,7 @@ when using the file type, logs are saved in LogRtabmap.txt (located in the worki
                             <string/>
                            </property>
                            <property name="icon">
-                            <iconset>
+                            <iconset resource="../GuiLib.qrc">
                              <normaloff>:/images/mag_glass.png</normaloff>:/images/mag_glass.png</iconset>
                            </property>
                           </widget>
@@ -13061,6 +13061,11 @@ If set to false, classic RTAB-Map loop closure detection is done using only imag
                         <item>
                          <property name="text">
                           <string>VINS-Fusion</string>
+                         </property>
+                        </item>
+                        <item>
+                         <property name="text">
+                          <string>Line Fusion</string>
                          </property>
                         </item>
                        </widget>
